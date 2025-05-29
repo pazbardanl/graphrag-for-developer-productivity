@@ -10,13 +10,12 @@ def main():
     dataProvider = DataProvider("mock_data/mock_github_events.json")
     processor = Processor()
     publisher = Publisher(kafka_bootstrap_servers="kafka:9092", kafka_topic="PR_events")
-    print("Fetching data:")
     json_string = dataProvider.provide()
     events = processor.process(json_string)
-    print("Data:")
     for event in events:
         print(event)
         publisher.publish(event=event)
+    print("Ingestion service exited")
 
 
 if __name__ == "__main__":

@@ -17,12 +17,20 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - ALLOW_PLAINTEXT_LISTENER=yes
+
     depends_on:
       - zookeeper
+  
+  create-topics:
+    image: bitnami/kafka:latest
+    depends_on:
+      - kafka
+    entrypoint: [ "bash", "-c", "sleep 10 && kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic PR_events --partitions 1 --replication-factor 1" ]
 
   ingestion-service:
     build:
@@ -31,3 +39,6 @@ services:
     volumes:
       - ./ingestion-service/mock_data:/app/mock_data
     tty: true
+    depends_on:
+      - kafka
+      - create-topics
