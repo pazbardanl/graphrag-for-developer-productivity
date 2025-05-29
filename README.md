@@ -1,2 +1,2 @@
-# graphrag-for-developer-productivity
-GrapgRAG application for improved developer productivity
+# applications.graphgrag.poc
+POC for applications of GraphRAG for developer productivity 
