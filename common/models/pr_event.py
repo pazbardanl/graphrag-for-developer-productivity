@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -16,3 +17,11 @@ class PREventDto(BaseModel):
     review_user: Optional[str] = None
     review_state: Optional[str] = None
     review_submitted_at: Optional[datetime] = None
+
+    @classmethod
+    def from_flat_json(cls, json_string: str) -> 'PREventDto':
+        """
+        Parses a JSON string into a PREventDto instance.
+        """
+        data = json.loads(json_string)
+        return cls(**data)

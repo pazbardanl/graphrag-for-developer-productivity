@@ -1,5 +1,5 @@
 from confluent_kafka import Producer
-from common.models.pr_event import PREventDto
+from models.pr_event import PREventDto
 
 class Publisher:
     def __init__(self, kafka_bootstrap_servers: str, kafka_topic:str):
