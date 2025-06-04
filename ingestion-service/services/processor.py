@@ -1,7 +1,7 @@
 import json
 from typing import List
 from datetime import datetime
-from models.pr_event import PREventDto
+from common.models.pr_event import PREventDto
 
 class Processor:
 

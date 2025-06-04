@@ -34,11 +34,28 @@ services:
 
   ingestion-service:
     build:
-      context: ./ingestion-service
+      context: .
+      dockerfile: ingestion-service/Dockerfile
     container_name: ingestion-service
     volumes:
       - ./ingestion-service/mock_data:/app/mock_data
+      - ./common:/app/common
     tty: true
     depends_on:
       - kafka
       - create-topics
+    environment:
+      - PYTHONPATH=/app
+
+  graph-service:
+    build:
+      context: .
+      dockerfile: graph-service/Dockerfile
+    container_name: graph-service
+    volumes:
+      - ./common:/app/common
+    depends_on:
+      - ingestion-service
+    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      - PYTHONPATH=/app
