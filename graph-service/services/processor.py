@@ -3,9 +3,9 @@ from common.models.pr_event import PREventDto
 from services.publisher import Publisher
 
 class Processor:
-    def __init__(self):
+    def __init__(self, new_pr_event_publisher: Publisher):
         self.graph = nx.DiGraph()
-        self.new_pr_event_publisher = Publisher(kafka_bootstrap_servers="kafka:9092", kafka_topic="new_PR_events")
+        self.new_pr_event_publisher = new_pr_event_publisher # Publisher(kafka_bootstrap_servers="kafka:9092", kafka_topic="new_PR_events")
     
     def process(self, json_string: str):
         try:
