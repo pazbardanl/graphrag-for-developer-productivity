@@ -30,7 +30,12 @@ services:
     image: bitnami/kafka:latest
     depends_on:
       - kafka
-    entrypoint: [ "bash", "-c", "sleep 10 && kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic PR_events --partitions 1 --replication-factor 1" ]
+    entrypoint: [
+      "bash", "-c",
+      "sleep 10 && \
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic PR_events --partitions 1 --replication-factor 1 && \
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic new_PR_events --partitions 1 --replication-factor 1"
+    ]
 
   ingestion-service:
     build:
