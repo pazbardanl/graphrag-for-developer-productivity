@@ -68,6 +68,8 @@ services:
     container_name: graph-service
     volumes:
       - ./common:/app/common
+    ports:
+    - "8000:8000"
     depends_on:
       - ingestion-service
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
