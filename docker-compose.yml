@@ -1,5 +1,12 @@
 version: "3.9"
 
+x-shared-env: &shared-env
+  MOCK_DATA_PATH: mock_data/mock_github_events.json
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  KAFKA_PR_EVENTS_TOPIC: PR_events
+  KAFKA_NEW_PR_EVENTS_TOPIC: new_PR_events
+  KAFKA_GROUP_ID: gr-id-0
+
 services:
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -30,6 +37,7 @@ services:
     image: bitnami/kafka:latest
     depends_on:
       - kafka
+    container_name: create-topics
     entrypoint: [
       "bash", "-c",
       "sleep 10 && \
@@ -50,7 +58,8 @@ services:
       - kafka
       - create-topics
     environment:
-      - PYTHONPATH=/app
+      PYTHONPATH: /app
+      <<: *shared-env
 
   graph-service:
     build:
@@ -63,4 +72,5 @@ services:
       - ingestion-service
     entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
-      - PYTHONPATH=/app
+      PYTHONPATH: /app
+      <<: *shared-env
