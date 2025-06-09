@@ -5,14 +5,16 @@ x-shared-env: &shared-env
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
   KAFKA_PR_EVENTS_TOPIC: PR_events
   KAFKA_NEW_PR_EVENTS_TOPIC: new_PR_events
-  KAFKA_GROUP_ID: gr-id-0
+  KAFKA_REVIEWER_REPORT_TOPIC: reviewer_reports
+  KAFKA_GRAPH_SERVICE_GROUP_ID: graph_service_group
+  KAFKA_REVIEWER_SCORING_SERVICE_GROUP_ID: reviewer_scoring_service_group
 
 services:
   zookeeper:
     image: bitnami/zookeeper:latest
     container_name: zookeeper
     ports:
-      - "2181:2181"
+      - "22181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
 
@@ -42,7 +44,8 @@ services:
       "bash", "-c",
       "sleep 10 && \
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic PR_events --partitions 1 --replication-factor 1 && \
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic new_PR_events --partitions 1 --replication-factor 1"
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic new_PR_events --partitions 1 --replication-factor 1 && \
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic reviewer_reports --partitions 1 --replication-factor 1"
     ]
 
   ingestion-service:
@@ -72,7 +75,21 @@ services:
     - "8000:8000"
     depends_on:
       - ingestion-service
-    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      <<: *shared-env
+  
+  reviewer-scoring-service:
+    build:
+      context: .
+      dockerfile: reviewer-scoring-service/Dockerfile
+    container_name: reviewer-scoring-service
+    volumes:
+      - ./common:/app/common
+    depends_on:
+      - graph-service
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
       <<: *shared-env

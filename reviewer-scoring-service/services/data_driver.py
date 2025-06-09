@@ -11,8 +11,7 @@ class DataDriver:
         self.consumer = Consumer({
             'bootstrap.servers': kafka_bootstrap_servers,
             'group.id': group_id,
-            'auto.offset.reset': 'earliest',
-            'enable.auto.commit': True,
+            'auto.offset.reset': 'earliest'
         })
 
     def start(self):
@@ -26,7 +25,7 @@ class DataDriver:
                 if msg.error():
                     print(f"Consumer error: {msg.error()}")
                     continue
-                self.processor.process(msg.value())
+                self.processor.process(msg.value().decode('utf-8'))
         except KeyboardInterrupt:
             print("Consumer shutting down", flush=True)
         finally:
