@@ -5,14 +5,15 @@ x-shared-env: &shared-env
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
   KAFKA_PR_EVENTS_TOPIC: PR_events
   KAFKA_NEW_PR_EVENTS_TOPIC: new_PR_events
-  KAFKA_GROUP_ID: gr-id-0
+  KAFKA_GRAPH_SERVICE_GROUP_ID: graph_service_group
+  KAFKA_REVIEWER_SCORING_SERVICE_GROUP_ID: reviewer_scoring_service_group
 
 services:
   zookeeper:
     image: bitnami/zookeeper:latest
     container_name: zookeeper
     ports:
-      - "2181:2181"
+      - "22181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
 
@@ -72,7 +73,7 @@ services:
     - "8000:8000"
     depends_on:
       - ingestion-service
-    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
       <<: *shared-env
@@ -86,7 +87,7 @@ services:
       - ./common:/app/common
     depends_on:
       - graph-service
-    entrypoint: ["./wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
       <<: *shared-env

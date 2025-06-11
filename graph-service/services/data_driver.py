@@ -11,7 +11,8 @@ class DataDriver:
         self.consumer = Consumer({
             'bootstrap.servers': kafka_bootstrap_servers,
             'group.id': group_id,
-            'auto.offset.reset': 'earliest'
+            'auto.offset.reset': 'earliest',
+            'enable.auto.commit': True,
         })
 
     def start(self):

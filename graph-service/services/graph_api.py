@@ -35,7 +35,7 @@ class GraphAPI:
         def get_prs_modifying_file(repo_name: str, file_name: str):
             result = self.graph_wrapper.get_prs_modifying_file(file_name)
             if not result:
-                raise HTTPException(status_code=404, detail="File not found or does not have any modifying PRs")
+                raise HTTPException(status_code=404, detail=f"File {file_name} in repo {repo_name} not found or does not have any modifying PRs")
             return result
 
         @self.app.get("/prs/{pr_id}/author")

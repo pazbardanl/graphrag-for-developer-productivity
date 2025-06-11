@@ -49,7 +49,6 @@ class GraphWrapper:
             for _, target, data in self.graph.out_edges(pr_number, data=True)
             if data.get("label") == "modified_file"
         ]
-        print(f'[GraphWrapper][get_files_modified_by_pr] files = {files}')
         return files
     
     def get_repo_related_to_pr(self, pr_number: str) -> list[any]:
@@ -60,7 +59,6 @@ class GraphWrapper:
             for _, target, data in self.graph.out_edges(pr_number, data=True)
             if data.get("label") == "related_to_repo"
         ]
-        print(f'[GraphWrapper][get_repo_related_to_pr] repos = {repos}')
         return repos
     
     def get_prs_modifying_file(self, file_name: str) -> list[any]:
@@ -71,7 +69,6 @@ class GraphWrapper:
             for source, _, data in self.graph.in_edges(file_name, data=True)
             if data.get("label") == "modified_file"
         ]
-        print(f'[GraphWrapper][get_prs_modifying_file] prs = {prs}')
         return prs
 
     def get_author_of_pr(self, pr_number: int) -> any:

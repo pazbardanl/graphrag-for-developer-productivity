@@ -13,7 +13,7 @@ def __get_kafka_config():
     kafka_bootstrap_servers = os.environ["KAFKA_BOOTSTRAP_SERVERS"]
     pr_events_topic = os.environ["KAFKA_PR_EVENTS_TOPIC"]
     new_pr_events_topic = os.environ["KAFKA_NEW_PR_EVENTS_TOPIC"]
-    group_id = os.environ["KAFKA_GROUP_ID"]
+    group_id = os.environ["KAFKA_GRAPH_SERVICE_GROUP_ID"]
     return kafka_bootstrap_servers, pr_events_topic, new_pr_events_topic, group_id
 
 def __start_data_driver(kafka_bootstrap_servers, pr_events_topic, group_id, processor):
@@ -33,6 +33,7 @@ def main():
     processor = Processor(graph_wrapper, new_pr_events_publisher)
     __start_data_driver(kafka_bootstrap_servers, pr_events_topic, group_id, processor)
     __start_graph_api(graph_wrapper)
+    print("Graph service exited")
 
 if __name__ == "__main__":
     main()
