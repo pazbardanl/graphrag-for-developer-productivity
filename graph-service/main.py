@@ -8,6 +8,9 @@ from services.processor import Processor
 from services.publisher import Publisher
 from services.graph_api import GraphAPI
 from services.graph_wrapper import GraphWrapper
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 def __get_kafka_config():
     kafka_bootstrap_servers = os.environ["KAFKA_BOOTSTRAP_SERVERS"]
@@ -25,7 +28,7 @@ def __start_graph_api(graph_wrapper: GraphWrapper):
     uvicorn.run(api.app, host="0.0.0.0", port=8000, access_log=False)
 
 def main():
-    print("Graph service started")
+    logger.info("started")
     kafka_bootstrap_servers, pr_events_topic, new_pr_events_topic, group_id = __get_kafka_config()
     graph = nx.MultiDiGraph()
     graph_wrapper = GraphWrapper(graph)
@@ -33,7 +36,7 @@ def main():
     processor = Processor(graph_wrapper, new_pr_events_publisher)
     __start_data_driver(kafka_bootstrap_servers, pr_events_topic, group_id, processor)
     __start_graph_api(graph_wrapper)
-    print("Graph service exited")
+    logger.info("exited")
 
 if __name__ == "__main__":
     main()

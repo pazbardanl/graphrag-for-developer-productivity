@@ -3,9 +3,13 @@ from typing import Callable
 from services.processor import Processor
 import threading
 import json
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 class DataDriver:
     def __init__(self, kafka_bootstrap_servers: str, kafka_topic: str, group_id: str, processor: Processor):
+        logger.info("initialized, listening to topic: %s", kafka_topic)
         self.kafka_topic = kafka_topic
         self.processor = processor
         self.consumer = Consumer({
@@ -15,9 +19,10 @@ class DataDriver:
         })
 
     def start(self):
-        print("Starting Kafka consumer loop..." ,flush=True)
+        logger.info("started")
         self.consumer.subscribe([self.kafka_topic])
         try:
+            logger.info("Consumer loop started")
             while True:
                 msg = self.consumer.poll(timeout=1.0)
                 if msg is None:
@@ -27,6 +32,8 @@ class DataDriver:
                     continue
                 self.processor.process(msg.value().decode('utf-8'))
         except KeyboardInterrupt:
-            print("Consumer shutting down", flush=True)
+            logger.info("Consumer shutting down")
         finally:
             self.consumer.close()
+            logger.info("Consumer closed")
+        logger.info("exited")

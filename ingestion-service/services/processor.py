@@ -2,6 +2,9 @@ import json
 from typing import List
 from datetime import datetime
 from common.models.pr_event import PREventDto
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 class Processor:
 
@@ -9,6 +12,7 @@ class Processor:
         try:
             raw_events = json.loads(json_string)
         except json.JSONDecodeError as e:
+            logger.error("Invalid JSON format: %s", e)
             raise ValueError("Invalid JSON format") from e
 
         parsed = []
@@ -17,9 +21,9 @@ class Processor:
                 dto = self.__parse_event(item)
                 parsed.append(dto)
             except KeyError as e:
-                print(f"Missing expected key in event {i}: {e}")
+                logger.error(f"Missing expected key in event {i}: {e}")
             except Exception as e:
-                print(f"Error parsing event {i}: {e}")
+                logger.error(f"Error parsing event {i}: {e}")
         return parsed
     
     def __parse_event(self, event_json: str) -> PREventDto:
