@@ -1,9 +1,11 @@
-class ReviewerScoresDto:
-    def __init__(self, reviewer_user_id: str, authored_score: float = 0.0, commented_score: float = 0.0, approved_score: float = 0.0):
-        self.reviewer_user_id = reviewer_user_id
-        self.authored_score = authored_score
-        self.commented_score = commented_score
-        self.approved_score = approved_score
+
+from pydantic import BaseModel
+
+class ReviewerScoresDto(BaseModel):
+    reviewer_user_id: str
+    authored_score: float = 0.0
+    commented_score: float = 0.0
+    approved_score: float = 0.0
     
     def __add__(self, other):
         if not isinstance(other, ReviewerScoresDto):
