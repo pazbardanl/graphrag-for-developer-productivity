@@ -1,8 +1,12 @@
 import requests
 import urllib.parse
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 class GraphDataProvider:
     def __init__(self, base_url: str = "http://graph-service:8000"):
+        logger.info("initialized with base URL: %s", base_url)
         self.base_url = base_url
 
     def get_prs_modifying_file(self, repo_name: str, file_name: str) -> list[int]:

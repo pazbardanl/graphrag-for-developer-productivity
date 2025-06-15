@@ -1,7 +1,11 @@
 from  networkx import MultiDiGraph
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 class GraphWrapper:
     def __init__(self, graph:MultiDiGraph):
+        logger.info("initialized")
         self.graph = graph
     
     def add_opened_pr(self, pr_number: str, repo_name: str, pr_user: str, files_changed: list[any]):

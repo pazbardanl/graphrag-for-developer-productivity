@@ -1,9 +1,13 @@
 from common.models.pr_event import PREventDto
 from services.publisher import Publisher
 from services.graph_wrapper import GraphWrapper
+from common.helpers.my_logger import MyLogger
+
+logger = MyLogger().get_logger(__name__)
 
 class Processor:
     def __init__(self, graph_wrapper: GraphWrapper, new_pr_event_publisher: Publisher):
+        logger.info("initialized")
         self.graph_wrapper = graph_wrapper
         self.new_pr_event_publisher = new_pr_event_publisher
     
@@ -11,14 +15,14 @@ class Processor:
         try:
             pr_event = PREventDto.from_flat_json(json_string)
             if pr_event is None:
-                print("No PR event to process", flush = True)
+                logger.error("No PR event to process")
                 return
             self.__handle_pr_event(pr_event)
         except ValueError as e:
-            print(f"Invalid JSON format: {e}", flush = True)
+            logger.error(f"Invalid JSON format: {e}")
             return
         except Exception as e:
-            print(f"Error processing pr_event: {e}", flush = True)
+            logger.error(f"Error processing pr_event: {e}")
             return
     
     def __handle_pr_event(self, pr_event: PREventDto):

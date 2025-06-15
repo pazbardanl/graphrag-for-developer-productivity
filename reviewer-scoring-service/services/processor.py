@@ -3,10 +3,14 @@ from services.publisher import Publisher
 from common.models.pr_event import PREventDto
 from common.models.reviewer_scores import ReviewerScoresDto
 from common.models.pr_reviewers_report import PRReviewerReport
+from common.helpers.my_logger import MyLogger
 from typing import Dict
+
+logger = MyLogger().get_logger(__name__)
 
 class Processor:
     def __init__(self, graph_data_provider: GraphDataProvider, reviewer_report_publisher: Publisher):
+        logger.info("initialized")
         self.graph_data_provider = graph_data_provider
         self.reviewer_report_publisher = reviewer_report_publisher
 
@@ -15,7 +19,7 @@ class Processor:
         pr_weights = self._calculate_pr_weights_for_pr_event(pr_event_dto)
         author = pr_event_dto.pr_user
         if not author:
-            print('PR author not provided', flush=True)
+            logger.error('PR author not provided')
             return
         reviewer_scores_set = self._calculate_reviewer_scores(pr_weights, author)
         pr_reviewer_report = PRReviewerReport(pr_event_dto.pr_number, reviewer_scores_set)
@@ -26,7 +30,7 @@ class Processor:
         repo_name = pr_event_dto.repo_name
         changed_files = pr_event_dto.pr_files_changed
         if not original_pr_number or not repo_name or not changed_files:
-            print('PR number, repo name or changed files not provided', flush=True)
+            logger.error('PR number, repo name or changed files not provided')
             return {}
         relevant_prs = self._get_relevant_prs(original_pr_number, repo_name, changed_files)
         pr_weights = self._calculate_pr_weights(relevant_prs, changed_files)
