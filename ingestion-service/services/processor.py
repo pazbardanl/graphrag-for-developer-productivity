@@ -18,7 +18,7 @@ class Processor:
         parsed = []
         for i, item in enumerate(raw_events):
             try:
-                dto = self.__parse_event(item)
+                dto = self._parse_event(item)
                 parsed.append(dto)
             except KeyError as e:
                 logger.error(f"Missing expected key in event {i}: {e}")
@@ -26,7 +26,7 @@ class Processor:
                 logger.error(f"Error parsing event {i}: {e}")
         return parsed
     
-    def __parse_event(self, event_json: str) -> PREventDto:
+    def _parse_event(self, event_json: str) -> PREventDto:
         action = event_json["action"]
         repo_name = event_json["repository"]["full_name"]
         sender = event_json["sender"]["login"]

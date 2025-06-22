@@ -1,0 +1,85 @@
+[
+  {
+    "action": "opened",
+    "pull_request": {
+      "number": 200,
+      "title": "General improvements",
+      "created_at": "2024-12-01T09:00:00Z",
+      "user": {
+        "login": "alice"
+      },
+      "changed_files": [
+        "utils_helpers.py"
+      ]
+    },
+    "repository": {
+      "full_name": "core_utils"
+    },
+    "sender": {
+      "login": "alice"
+    }
+  },{
+    "action": "opened",
+    "pull_request": {
+      "number": 100,
+      "title": "General improvements",
+      "created_at": "2024-12-01T09:00:00Z",
+      "user": {
+        "login": "alice"
+      },
+      "changed_files": [
+        "utils/helpers.py"
+      ]
+    },
+    "repository": {
+      "full_name": "core/utils"
+    },
+    "sender": {
+      "login": "alice"
+    }
+  },
+  {
+    "action": "opened",
+    "pull_request": {
+      "number": 101,
+      "title": "Update common utilities",
+      "created_at": "2024-12-01T09:30:00Z",
+      "user": {
+        "login": "bob"
+      },
+      "changed_files": [
+        "utils/common.py",
+        "utils/helpers.py"
+      ]
+    },
+    "repository": {
+      "full_name": "core/utils"
+    },
+    "sender": {
+      "login": "bob"
+    }
+  },
+  {
+    "action": "submitted",
+    "review": {
+      "user": {
+        "login": "erin"
+      },
+      "state": "commented",
+      "submitted_at": "2024-12-01T19:00:00Z"
+    },
+    "pull_request": {
+      "number": 100,
+      "title": "General improvements",
+      "user": {
+        "login": "alice"
+      }
+    },
+    "repository": {
+      "full_name": "core/utils"
+    },
+    "sender": {
+      "login": "erin"
+    }
+  }
+]
