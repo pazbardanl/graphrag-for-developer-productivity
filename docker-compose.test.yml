@@ -1,0 +1,73 @@
+version: "3.9"
+
+
+x-shared-env: &shared-env
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  KAFKA_PR_EVENTS_TOPIC: test_PR_events
+  KAFKA_NEW_PR_EVENTS_TOPIC: test_new_PR_events
+  KAFKA_REVIEWER_REPORT_TOPIC: test_reviewer_reports
+  KAFKA_REVIEWER_RECOMMENDATION_TOPIC: test_reviewer_recommendations
+  KAFKA_GRAPH_SERVICE_GROUP_ID: test_graph_service_group
+  KAFKA_REVIEWER_SCORING_SERVICE_GROUP_ID: test_reviewer_scoring_service_group
+  KAFKA_REVIEWER_RECOMMENDATION_SERVICE_GROUP_ID: test_reviewer_recommendation_service_group
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+services:
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "22181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_LOG_LEVEL=WARN
+    logging:
+      driver: "none"
+
+  kafka:
+    image: bitnami/kafka:3.5
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LOG_LEVEL=WARN
+    depends_on:
+      - zookeeper
+    logging:
+      driver: "none"
+
+  graph-service:
+    build:
+      context: .
+      dockerfile: graph-service/Dockerfile
+    container_name: test-graph-service
+    volumes:
+      - ./common:/app/common
+    ports:
+    - "8000:8000"
+    depends_on:
+      - kafka
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      <<: *shared-env
+
+  test-runner:
+    build:
+      context: ./tests
+      dockerfile: Dockerfile.test
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      sh -c "./tests/wait-for-it.sh kafka:9092 -- pytest -s --log-cli-level=INFO tests/integration/test_graph_service_new_pr_events.py --maxfail=1 --disable-warnings"
