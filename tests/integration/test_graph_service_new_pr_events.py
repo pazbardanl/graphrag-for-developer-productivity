@@ -11,7 +11,7 @@ from typing import List
 from common.models.pr_event import PREventDto
 
 # TODO: put this in docker-compose.test.yml
-INPUT_FILE_PATH = "tests/test_data/mock_github_events_3events.json"
+INPUT_FILE_PATH = "tests/test_data/mock_github_events_4events_3prs.json"
 INPUT_TOPIC = "test_PR_events"
 OUTPUT_TOPIC = "test_new_PR_events"
 KAFKA_BOOTSTRAP_SERVERS = "kafka:9092"
@@ -20,6 +20,7 @@ EXPECTED_OUTPUT_COUNT = 3
 TIMEOUT_SECS = 10
 
 logger = MyLogger().get_logger(__name__)
+logger.propagate = False
 
 def assert_on_output_events(output_events: List[dict]):
     expected_pr_numbers = [100, 200, 101]
