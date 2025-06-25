@@ -1,4 +1,5 @@
 import logging
+import sys
 
 class MyLogger:
 
@@ -8,15 +9,9 @@ class MyLogger:
         self.configured = False
 
     def get_logger(self, name):
-        if not self.configured:
-            self._configure_logging()
-        if not name:
-            raise ValueError("Logger name must be provided")
-        return logging.getLogger(name)
-    
-    def _configure_logging(self):
-        logging.basicConfig(
-            level=logging.INFO,
-            format=MyLogger.DEFAULT_FORMAT
-        )
-        self.configured = True
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter(MyLogger.DEFAULT_FORMAT))
+        logger.handlers = [handler]
+        return logger
