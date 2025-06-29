@@ -1,4 +1,5 @@
 import openai
+import re
 from services.pr_reviewer_selector import PRReviewerSelector
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
 from common.models.pr_reviewers_report import PRReviewerReport
@@ -65,7 +66,7 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
     def _build_recommendation(self, ai_reply: str, pr_report: PRReviewerReport) -> PRReviewerRecommendation:
         try:
             recommended_reviewer, reasoning = ai_reply.split('|', 1)
-            recommended_reviewer = recommended_reviewer.strip()
+            recommended_reviewer = self.clean_reviewer(recommended_reviewer)
             reasoning = reasoning.strip()
         except ValueError:
             logger.error(f"Invalid response format from OpenAI: {ai_reply}")
@@ -77,3 +78,7 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
             reasoning=reasoning
         )
         return recommendation
+    
+    def clean_reviewer(self, val):
+        # Remove any leading/trailing whitespace and quotes
+        return re.sub(r'^[\'"]+|[\'"]+$', '', val.strip())

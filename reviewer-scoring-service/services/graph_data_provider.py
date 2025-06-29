@@ -15,7 +15,7 @@ class GraphDataProvider:
         url = f"{self.base_url}/repos/{repo_encoded}/files/{file_encoded}/prs"
         response = requests.get(url, timeout=5)
         if response.status_code != 200:
-            logger.error("Failed to fetch PRs modifying file %s in repo %s: %s", file_name, repo_name, response.text)
+            logger.debug("Unable to fetch PRs modifying file %s in repo %s: %s", file_name, repo_name, response.text)
             return[]
         logger.debug("Fetched PRs modifying file %s in repo %s: %s", file_name, repo_name, response.json())
         return response.json()
@@ -24,7 +24,7 @@ class GraphDataProvider:
         url = f"{self.base_url}/prs/{pr_number}/files"
         response = requests.get(url, timeout=5)
         if response.status_code != 200:
-            logger.error("Failed to fetch files modified by PR %d: %s", pr_number, response.text)
+            logger.debug("Unable to fetch files modified by PR %d: %s", pr_number, response.text)
             return []
         logger.debug("Fetched files modified by PR %d: %s", pr_number, response.json())
         return response.json()
@@ -33,7 +33,7 @@ class GraphDataProvider:
         url = f"{self.base_url}/prs/{pr_number}/author"
         response = requests.get(url, timeout=5)
         if response.status_code != 200:
-            logger.error("Failed to fetch author for PR %d: %s", pr_number, response.text)
+            logger.debug("Unable to fetch author for PR %d: %s", pr_number, response.text)
             return None
         logger.debug("Fetched author for PR %d: %s", pr_number, response.json())
         return response.json()
@@ -42,7 +42,7 @@ class GraphDataProvider:
         url = f"{self.base_url}/prs/{pr_number}/approver"
         response = requests.get(url, timeout=5)
         if response.status_code != 200:
-            logger.error("Failed to fetch approver for PR %d: %s", pr_number, response.text)
+            logger.debug("Unable to fetch approver for PR %d: %s", pr_number, response.text)
             return None
         logger.debug("Fetched approver for PR %d: %s", pr_number, response.json())
         return response.json()
@@ -51,7 +51,7 @@ class GraphDataProvider:
         url = f"{self.base_url}/prs/{pr_number}/commenters"
         response = requests.get(url, timeout=5)
         if response.status_code != 200:
-            logger.error("Failed to fetch commenters for PR %d: %s", pr_number, response.text)
+            logger.debug("Unable to fetch commenters for PR %d: %s", pr_number, response.text)
             return []
         logger.debug("Fetched commenters for PR %d: %s", pr_number, response.json())
         return response.json()

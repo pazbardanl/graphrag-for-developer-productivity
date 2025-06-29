@@ -68,6 +68,20 @@ services:
     environment:
       PYTHONPATH: /app
       <<: *shared-env
+  
+  reviewer-recommendation-service:
+    build:
+      context: .
+      dockerfile: reviewer-recommendation-service/Dockerfile
+    container_name: test-reviewer-recommendation-service
+    volumes:
+      - ./common:/app/common
+    depends_on:
+      - reviewer-scoring-service
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      <<: *shared-env
 
   test-runner:
     build:
