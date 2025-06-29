@@ -1,0 +1,29 @@
+name: Ingestion Service Test
+
+on:
+  push:
+
+jobs:
+  ingestion-service-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes docker-ce-cli
+          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+          mkdir -p $DOCKER_CONFIG/cli-plugins
+          curl -SL https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+          docker compose version
+
+      - name: Run ingestion-service only
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          docker compose up --build --abort-on-container-exit ingestion-service
+          docker compose down -v
