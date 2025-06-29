@@ -29,9 +29,10 @@ class DataDriver:
                 if msg is None:
                     continue
                 if msg.error():
-                    print(f"Consumer error: {msg.error()}")
+                    logger.error(f"Consumer error: {msg.error()}")
                     continue
                 self.processor.process(msg.value())
+                logger.debug("Received message: %s", msg.value())
         except KeyboardInterrupt:
             logger.info("Consumer shutting down")
         finally:

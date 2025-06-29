@@ -1,0 +1,214 @@
+[
+  {
+    "pr_number": 100,
+    "recommended_reviewer": "ivan",
+    "pr_reviewer_report": {
+      "pr_number": 100,
+      "reviewer_scores": [
+        {"reviewer_user_id": "ivan", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.5},
+        {"reviewer_user_id": "bob", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 101,
+    "recommended_reviewer": "alice",
+    "pr_reviewer_report": {
+      "pr_number": 101,
+      "reviewer_scores": [
+        {"reviewer_user_id": "alice", "authored_score": 1.5, "commented_score": 0.5, "approved_score": 0.5},
+        {"reviewer_user_id": "ivan", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.25},
+        {"reviewer_user_id": "judy", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.25},
+        {"reviewer_user_id": "heidi", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 104,
+    "recommended_reviewer": "grace",
+    "pr_reviewer_report": {
+      "pr_number": 104,
+      "reviewer_scores": [
+        {"reviewer_user_id": "grace", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 105,
+    "recommended_reviewer": "grace",
+    "pr_reviewer_report": {
+      "pr_number": 105,
+      "reviewer_scores": [
+        {"reviewer_user_id": "grace", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 106,
+    "recommended_reviewer": "ivan",
+    "pr_reviewer_report": {
+      "pr_number": 106,
+      "reviewer_scores": [
+        {"reviewer_user_id": "ivan", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.5},
+        {"reviewer_user_id": "judy", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 108,
+    "recommended_reviewer": "alice",
+    "pr_reviewer_report": {
+      "pr_number": 108,
+      "reviewer_scores": [
+        {"reviewer_user_id": "alice", "authored_score": 0.75, "commented_score": 0.5, "approved_score": 0.5},
+        {"reviewer_user_id": "bob", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.0},
+        {"reviewer_user_id": "grace", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "judy", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.25}
+      ]
+    }
+  },
+  {
+    "pr_number": 109,
+    "recommended_reviewer": "erin",
+    "pr_reviewer_report": {
+      "pr_number": 109,
+      "reviewer_scores": [
+        {"reviewer_user_id": "bob", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.0},
+        {"reviewer_user_id": "grace", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "ivan", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.25},
+        {"reviewer_user_id": "alice", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 1.0},
+        {"reviewer_user_id": "heidi", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 110,
+    "recommended_reviewer": "bob",
+    "pr_reviewer_report": {
+      "pr_number": 110,
+      "reviewer_scores": [
+        {"reviewer_user_id": "bob", "authored_score": 1.0, "commented_score": 1.0, "approved_score": 0.0},
+        {"reviewer_user_id": "ivan", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.25},
+        {"reviewer_user_id": "judy", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.25},
+        {"reviewer_user_id": "heidi", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 111,
+    "recommended_reviewer": "ivan",
+    "pr_reviewer_report": {
+      "pr_number": 111,
+      "reviewer_scores": [
+        {"reviewer_user_id": "carol", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.0},
+        {"reviewer_user_id": "ivan", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 112,
+    "recommended_reviewer": "ivan",
+    "pr_reviewer_report": {
+      "pr_number": 112,
+      "reviewer_scores": [
+        {"reviewer_user_id": "ivan", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "bob", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 113,
+    "recommended_reviewer": "frank",
+    "pr_reviewer_report": {
+      "pr_number": 113,
+      "reviewer_scores": [
+        {"reviewer_user_id": "frank", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 114,
+    "recommended_reviewer": "judy",
+    "pr_reviewer_report": {
+      "pr_number": 114,
+      "reviewer_scores": [
+        {"reviewer_user_id": "bob", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.0},
+        {"reviewer_user_id": "grace", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "ivan", "authored_score": 0.25, "commented_score": 0.25, "approved_score": 0.25},
+        {"reviewer_user_id": "judy", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "alice", "authored_score": 0.25, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "heidi", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 115,
+    "recommended_reviewer": "dave",
+    "pr_reviewer_report": {
+      "pr_number": 115,
+      "reviewer_scores": [
+        {"reviewer_user_id": "dave", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 116,
+    "recommended_reviewer": "frank",
+    "pr_reviewer_report": {
+      "pr_number": 116,
+      "reviewer_scores": [
+        {"reviewer_user_id": "erin", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.0},
+        {"reviewer_user_id": "frank", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 117,
+    "recommended_reviewer": "erin",
+    "pr_reviewer_report": {
+      "pr_number": 117,
+      "reviewer_scores": [
+        {"reviewer_user_id": "bob", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.0},
+        {"reviewer_user_id": "judy", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "alice", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.0},
+        {"reviewer_user_id": "erin", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 118,
+    "recommended_reviewer": "bob",
+    "pr_reviewer_report": {
+      "pr_number": 118,
+      "reviewer_scores": [
+        {"reviewer_user_id": "carol", "authored_score": 0.5, "commented_score": 0.5, "approved_score": 0.0},
+        {"reviewer_user_id": "bob", "authored_score": 1.0, "commented_score": 0.0, "approved_score": 0.0}
+      ]
+    }
+  },
+  {
+    "pr_number": 119,
+    "recommended_reviewer": "dave",
+    "pr_reviewer_report": {
+      "pr_number": 119,
+      "reviewer_scores": [
+        {"reviewer_user_id": "dave", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  },
+  {
+    "pr_number": 103,
+    "recommended_reviewer": "judy",
+    "pr_reviewer_report": {
+      "pr_number": 103,
+      "reviewer_scores": [
+        {"reviewer_user_id": "judy", "authored_score": 0.5, "commented_score": 0.0, "approved_score": 0.5}
+      ]
+    }
+  }
+]

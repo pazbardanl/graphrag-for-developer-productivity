@@ -24,7 +24,7 @@ TIMEOUT_SECS = 10
 logger = MyLogger().get_logger(__name__)
 logger.propagate = False
 
-def test_graph_service_new_pr_events():
+def test_graph_service_reviewer_scoring_service_integ():
     logger.info(f"Reading test input events from: {INPUT_FILE_PATH}")
     input_pr_events = get_test_pr_events(INPUT_FILE_PATH)
     logger.info(f'Injecting {len(input_pr_events)} input PR events into {INPUT_TOPIC}...')
@@ -59,15 +59,3 @@ def assert_on_output_events(output_events: List[dict]):
     sorted_expected = sort_events(expected_events)
     assert sorted_actual == sorted_expected, f"Output events do not match expected events.\nExpected: {sorted_expected}\nActual: {sorted_actual}"
     logger.info("Output events match expected events.")
-    
-
-# def test_graph_service_new_pr_events():
-#     logger.info(f"Reading test input events from: {INPUT_FILE_PATH}")
-#     input_pr_events = get_test_pr_events(INPUT_FILE_PATH)
-#     logger.info(f'Injecting {len(input_pr_events)} input PR events into {INPUT_TOPIC}...')
-#     inject_input_pr_events(input_pr_events, KAFKA_BOOTSTRAP_SERVERS, INPUT_TOPIC)
-#     logger.info(f'Waiting for {EXPECTED_OUTPUT_COUNT} messages on {OUTPUT_TOPIC}...')
-#     output_events = capture_output_events(KAFKA_BOOTSTRAP_SERVERS, OUTPUT_TOPIC, GROUP_ID, EXPECTED_OUTPUT_COUNT, TIMEOUT_SECS)
-#     logger.info(f'Asserting on {len(output_events)} messages captured from {OUTPUT_TOPIC}')
-#     assert_on_output_events(output_events)
-#     logger.info(f'Test completed successfully!')
