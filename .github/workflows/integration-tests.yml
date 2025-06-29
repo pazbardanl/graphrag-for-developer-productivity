@@ -1,0 +1,60 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes docker-ce-cli
+          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+          mkdir -p $DOCKER_CONFIG/cli-plugins
+          curl -SL https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+          docker compose version
+
+      - name: Test Runner Short-circuit Sanity Test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_runner_sanity_shortcircuit.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af
+      
+      - name: Graph Service New PR Events Test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_graph_service_new_pr_events.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af
+      
+      - name: Graph Service -> Reviewer Scoring Integration Test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_graph_service_reviewer_scoring_service_integ.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-scoring-service test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af
+      
+      - name: Graph Service -> Reviewer Scoring Service -> Reviewer Recommendation Service Integration Test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_graph_service_reviewer_scoring_service_integ.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-scoring-service reviewer-recommendation-service test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af

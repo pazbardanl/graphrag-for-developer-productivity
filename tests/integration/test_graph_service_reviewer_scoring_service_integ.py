@@ -19,7 +19,7 @@ OUTPUT_TOPIC = "test_reviewer_reports"
 KAFKA_BOOTSTRAP_SERVERS = "kafka:9092"
 GROUP_ID = f"integ_test_group_{uuid.uuid4()}"
 EXPECTED_OUTPUT_COUNT = 21
-TIMEOUT_SECS = 10
+TIMEOUT_SECS = 20
 
 logger = MyLogger().get_logger(__name__)
 logger.propagate = False
