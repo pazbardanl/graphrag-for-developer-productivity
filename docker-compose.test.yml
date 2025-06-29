@@ -39,13 +39,27 @@ services:
     logging:
       driver: "none"
 
+  # graph-service:
+  #   build:
+  #     context: .
+  #     dockerfile: graph-service/Dockerfile
+  #   container_name: test-graph-service
+  #   volumes:
+  #     - ./common:/app/common
+  #   ports:
+  #   - "8000:8000"
+  #   depends_on:
+  #     - kafka
+  #   entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+  #   environment:
+  #     PYTHONPATH: /app
+  #     <<: *shared-env
+  
   graph-service:
     build:
       context: .
       dockerfile: graph-service/Dockerfile
     container_name: test-graph-service
-    volumes:
-      - ./common:/app/common
     ports:
     - "8000:8000"
     depends_on:
