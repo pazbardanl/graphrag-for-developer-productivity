@@ -74,8 +74,6 @@ services:
       context: .
       dockerfile: reviewer-scoring-service/Dockerfile
     container_name: test-reviewer-scoring-service
-    volumes:
-      - ./common:/app/common
     depends_on:
       - graph-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "./common/scripts/wait-for-it.sh", "graph-service:8000", "--", "python", "main.py"]
