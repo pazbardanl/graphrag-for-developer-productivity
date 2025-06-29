@@ -1,4 +1,4 @@
-name: Ingestion Service Test
+name: Integration Tests
 
 on:
   push:
@@ -21,9 +21,11 @@ jobs:
           chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
           docker compose version
 
-      - name: Run ingestion-service only
+      - name: Test Runner Short-circuit Sanity Test
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_runner_sanity_shortcircuit.py
+
         run: |
-          docker compose up --build --abort-on-container-exit zookeeper kafka create-topics ingestion-service
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka test-runner
           docker compose down -v

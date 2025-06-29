@@ -85,14 +85,13 @@ services:
 
   test-runner:
     build:
-      context: ./tests
-      dockerfile: Dockerfile.test
+      context: .
+      dockerfile: tests/Dockerfile.test
     depends_on:
       - kafka
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    volumes:
-      - .:/app
+      PYTHONPATH: /
     working_dir: /app
     command: >
       sh -c "./tests/wait-for-it.sh kafka:9092 -- pytest -s --log-cli-level=INFO ${TEST_FILE} --maxfail=1 --disable-warnings"
