@@ -25,5 +25,5 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          docker compose up --build --abort-on-container-exit ingestion-service
+          docker compose up --build --abort-on-container-exit zookeeper kafka ingestion-service
           docker compose down -v

@@ -62,6 +62,7 @@ services:
     depends_on:
       - kafka
       - create-topics
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
       <<: *shared-env
