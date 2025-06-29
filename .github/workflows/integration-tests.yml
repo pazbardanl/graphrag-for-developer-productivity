@@ -44,3 +44,11 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-scoring-service test-runner
           docker compose down -v
+      
+      - name: Graph Service -> Reviewer Scoring Service -> Reviewer Recommendation Service Integration Test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_graph_service_reviewer_scoring_service_integ.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-scoring-service reviewer-recommendation-service test-runner
+          docker compose down -v

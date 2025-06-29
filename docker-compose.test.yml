@@ -86,8 +86,6 @@ services:
       context: .
       dockerfile: reviewer-recommendation-service/Dockerfile
     container_name: test-reviewer-recommendation-service
-    volumes:
-      - ./common:/app/common
     depends_on:
       - reviewer-scoring-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
