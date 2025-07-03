@@ -25,7 +25,7 @@ TIMEOUT_SECS = 30
 logger = MyLogger().get_logger(__name__)
 logger.propagate = False
 
-def test_graph_service_reviewer_scoring_service_reviewer_recommendation_service_integ():
+def test_graph_service_reviewer_recommendation_service_integ():
     logger.info("Clearing input Kafka topic")
     clear_kafka_topic(KAFKA_BOOTSTRAP_SERVERS, INPUT_TOPIC)
     logger.info("Clearing output Kafka topic")
@@ -70,7 +70,6 @@ def project_tested_event_fields(event):
 
 def assert_valid_recommendation_event(event, valid_pr_numbers: set[int]):
     assert event.get("pr_number") in valid_pr_numbers, f"pr_number {event.get('pr_number')} is not in the set of valid PR numbers: {valid_pr_numbers}"
-    assert event.get("pr_reviewer_report") is not None, "pr_reviewer_report is None"
     assert isinstance(event.get("recommended_reviewer"), str) and event.get("recommended_reviewer"), "recommended_reviewer is not a valid string"
     assert isinstance(event.get("reasoning"), str) and event.get("reasoning"), "reasoning is not a valid string"
 

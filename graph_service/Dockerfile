@@ -5,10 +5,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy files
-COPY graph-service/requirements.txt .
+COPY graph_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY graph-service/. .
+COPY graph_service/. .
 COPY common ./common
 RUN chmod +x /app/common/scripts/wait-for-it.sh
 

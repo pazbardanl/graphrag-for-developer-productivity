@@ -20,6 +20,14 @@ class GraphAPI:
         def get_edges():
             return list(self.graph_wrapper.get_all_edges())
 
+        @self.app.get("/subgraph/prs/{pr_id}/sibling-prs-by-common-files")
+        def get_pr_siblings_subgraph_by_common_modified_files(pr_id: int):
+            result = self.graph_wrapper.get_pr_siblings_subgraph_by_common_modified_files(pr_id)
+            if not result:
+                logger.warning(f"no PR-siblings by common files found for {pr_id}")
+                raise HTTPException(status_code=404, detail="PR not found or does not modify any files")
+            return result
+
         @self.app.get("/prs/{pr_id}/files")
         def get_files_for_pr(pr_id: int):
             result = self.graph_wrapper.get_files_modified_by_pr(pr_id)

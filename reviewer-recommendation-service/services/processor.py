@@ -2,7 +2,7 @@ from common.helpers.my_logger import MyLogger
 from services.pr_reviewer_selector import PRReviewerSelector
 from services.publisher import Publisher
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
-from common.models.pr_reviewers_report import PRReviewerReport
+from common.models.pr_event import PREventDto
 
 logger = MyLogger().get_logger(__name__)
 
@@ -17,15 +17,15 @@ class Processor:
         if not json_string:
             logger.error('Empty JSON string provided')
             return
-        pr_reviewer_report = PRReviewerReport.model_validate_json(json_string)
-        if not pr_reviewer_report:
-            logger.error('PR reviewer report not provided')
+        pr_event = PREventDto.model_validate_json(json_string)
+        if not pr_event:
+            logger.error('PR event not provided (None or empty)')
             return
-        logger.debug(f'Processing PR reviewer report: {pr_reviewer_report}')
+        logger.debug(f'Processing PR event: {pr_event}')
         try:
-            recommendation = self.reviewer_selector.select(pr_reviewer_report)
+            recommendation = self.reviewer_selector.select(pr_event)
             if not recommendation:
-                logger.info(f"No recommendation generated for PR {pr_reviewer_report.pr_number}")
+                logger.info(f"No recommendation generated for PR {pr_event.pr_number}")
                 return
             logger.debug(f"Recommendation: {recommendation}")
             self.publisher.publish(recommendation)
