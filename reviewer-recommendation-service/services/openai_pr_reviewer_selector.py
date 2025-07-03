@@ -1,8 +1,9 @@
 import openai
 import re
 from services.pr_reviewer_selector import PRReviewerSelector
+from services.graph_data_provider import GraphDataProvider
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
-from common.models.pr_reviewers_report import PRReviewerReport
+from common.models.pr_event import PREventDto
 from common.helpers.my_logger import MyLogger
 
 logger = MyLogger().get_logger(__name__)
@@ -11,19 +12,24 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
     MAX_TOKENS = 256
     TEMPERATURE = 0.2
 
-    def __init__(self):
+    def __init__(self, graph_data_provider: GraphDataProvider):
         self.client = openai.OpenAI()
+        self.graph_data_provider = graph_data_provider
         logger.info("initialized")
 
-    def select(self, pr_report: PRReviewerReport) -> PRReviewerRecommendation:
-        if not pr_report.reviewer_scores:
-            logger.error(f"No reviewer candidates available for PR {pr_report.pr_number}, no recommendations (returning None).")
+    def select(self, pr_event: PREventDto) -> PRReviewerRecommendation:
+        if not pr_event:
+            logger.error(f"Empty (None) PR event, no recommendations (returning None).")
             return None
-        prompt = self._get_prompt(pr_report)
+        pr_subgraph_json = self.graph_data_provider.get_pr_siblings_subgraph_by_common_modified_files(pr_event.pr_number)
+        logger.debug(f"PR-siblings subgraph json:{pr_subgraph_json}")
+        if not pr_subgraph_json:
+            logger.error(f"Empty PR-siblings subgraph for PR number {pr_event.pr_number}, no recommendations (returning None).")
+            return None
+        prompt = self._get_prompt(pr_subgraph_json, pr_event.pr_number)
         logger.debug(f"Generated prompt for OpenAI: {prompt}")
         ai_reply = self._get_open_ai_reply(prompt)
-        logger.debug(f"OpenAI reply received: {ai_reply}")
-        recommendation  = self._build_recommendation(ai_reply, pr_report)
+        recommendation  = self._build_recommendation(ai_reply, pr_event)
         if not recommendation:
             logger.debug(f"Cannot build recommendation from AI reply: {ai_reply}")
             return None
@@ -31,15 +37,26 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
         logger.info(f"PR number : {recommendation.pr_number}, Recommended reviewer: {recommendation.recommended_reviewer}") 
         return recommendation
     
-    def _get_prompt(self, pr_report: PRReviewerReport) -> str:
+    def _get_prompt(self, pr_subgraph_json: str, pr_number: int) -> str:
         return (
-            f"Select a reviewer for PR #{pr_report.pr_number} based on the following scores:\n"
-            f"{pr_report.model_dump_json()}. \n"
-            f"Keep in mind these scores are given based on a user's involvement with reviewing, approving and commenting on specific files related to the given PR, and not just general PR engagement scores.\n"
-            f"Please select the most suitable reviewer based on their authored score, review count, and file involvement.\n"
-            f"Provide the user ID of the recommended reviewer and a brief reasoning for your choice.\n"
-            f"also: weight your recommendations so that authored_score and approved_score scores are most important (40% each), and commented_score is less important (20%). Do not reflect or share these exact weights in your reasoning, as they are internal.\n"
-            "Please structure your response with the user ID of the recommended reviewer first, and then the reasoning behind your choice, with a pipe (|) separating them.\n"
+            f"You are an expert in recommending code reviewers for pull requests.\n"
+            f"You are given a subgraph in JSON format representing PRs and their relationships for a repository. "
+            f"The subgraph includes the source PR (PR #{pr_number}), all PRs that share modified files with it, "
+            f"and the authors, commenters, and approvers of these PRs, as well as the files they modified.\n"
+            f"Your task is to analyze the subgraph and recommend the best reviewer for PR #{pr_number} using the following algorithm:\n"
+            f"- For each PR that shares files with the source PR, calculate a weight based on the overlap of modified files: own_ratio = (number of overlapping files) / (number of files in this past PR), cross_ratio = (number of overlapping files) / (number of files in the current PR), and so overall_weight = own_ratio * cross_ratio.\n"
+            f"- Level of Involvment: Weight your recommendations so that authoring and approving scores are most important (40% each), and commenting score is less important (20%).\n" 
+            f"- Do not reflect or share the weight calculation method or the exact Level of Involvement weights in your reasoning, as they are internal.\n"
+            f"- For each user, sum their scores for authored, approved, and commented PRs (weighted by PR files overlap as well as Level of Involvement).\n"
+            f"- Do NOT recommend the author of the source PR.\n"
+            f"- Do NOT elaborate on your calculations or the on the alogorithm, just recommend a reviewer and provide reasoning in general, no details.\n"
+            f"- The user with the highest total score should be recommended as the reviewer.\n"
+            f"Input subgraph:\n{pr_subgraph_json}\n"
+            f"Please provide your response as follows:\n"
+            f"<user_id>|<reasoning>\n"
+            f"Where <user_id> is the recommended reviewer and <reasoning> is a brief explanation for your choice, referencing their involvement and the algorithm.\n"
+            f"If for some reason you cannot conclude on a recommended reviewer, please stick to the format above by putting NO_RECOMMENDED_USER in <user_id>, and put the explanation for not reaching a conclusion in <reasoning>.\n"
+            f"<user_id> should not contain anything other than recommended reviewer's name, if it exists. if not, then it be NO_RECOMMENDED_USER. DO NOT use <user_id> for any other purpose.\n"
         )
 
     def _get_open_ai_reply(self, prompt: str) -> str:
@@ -63,22 +80,21 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
             logger.error("OpenAI response is empty")
             raise ValueError("OpenAI response is empty")
     
-    def _build_recommendation(self, ai_reply: str, pr_report: PRReviewerReport) -> PRReviewerRecommendation:
+    def _build_recommendation(self, ai_reply: str, pr_event: PREventDto) -> PRReviewerRecommendation:
         try:
             recommended_reviewer, reasoning = ai_reply.split('|', 1)
-            recommended_reviewer = self.clean_reviewer(recommended_reviewer)
+            recommended_reviewer = self._clean_reviewer(recommended_reviewer)
             reasoning = reasoning.strip()
         except ValueError:
-            logger.error(f"Invalid response format from OpenAI: {ai_reply}")
-            raise ValueError("Invalid response format from OpenAI.")
+            logger.warning(f"Invalid response format from OpenAI: {ai_reply}, no recommendation generated. Returning None.")
+            return None
         recommendation = PRReviewerRecommendation(
-            pr_number=pr_report.pr_number,
-            pr_reviewer_report=pr_report,
+            pr_number=pr_event.pr_number,
             recommended_reviewer=recommended_reviewer,
             reasoning=reasoning
         )
         return recommendation
     
-    def clean_reviewer(self, val):
+    def _clean_reviewer(self, val):
         # Remove any leading/trailing whitespace and quotes
         return re.sub(r'^[\'"]+|[\'"]+$', '', val.strip())

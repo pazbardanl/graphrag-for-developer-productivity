@@ -69,24 +69,12 @@ services:
   graph-service:
     build:
       context: .
-      dockerfile: graph-service/Dockerfile
+      dockerfile: graph_service/Dockerfile
     container_name: graph-service
     ports:
     - "8000:8000"
     depends_on:
       - ingestion-service
-    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
-    environment:
-      PYTHONPATH: /app
-      <<: *shared-env
-  
-  reviewer-scoring-service:
-    build:
-      context: .
-      dockerfile: reviewer-scoring-service/Dockerfile
-    container_name: reviewer-scoring-service
-    depends_on:
-      - graph-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
@@ -98,7 +86,7 @@ services:
       dockerfile: reviewer-recommendation-service/Dockerfile
     container_name: reviewer-recommendation-service
     depends_on:
-      - reviewer-scoring-service
+      - graph-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app

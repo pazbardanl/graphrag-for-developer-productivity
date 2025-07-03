@@ -38,27 +38,11 @@ services:
       - zookeeper
     logging:
       driver: "none"
-
-  # graph-service:
-  #   build:
-  #     context: .
-  #     dockerfile: graph-service/Dockerfile
-  #   container_name: test-graph-service
-  #   volumes:
-  #     - ./common:/app/common
-  #   ports:
-  #   - "8000:8000"
-  #   depends_on:
-  #     - kafka
-  #   entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
-  #   environment:
-  #     PYTHONPATH: /app
-  #     <<: *shared-env
   
   graph-service:
     build:
       context: .
-      dockerfile: graph-service/Dockerfile
+      dockerfile: graph_service/Dockerfile
     container_name: test-graph-service
     ports:
     - "8000:8000"
@@ -69,25 +53,13 @@ services:
       PYTHONPATH: /app
       <<: *shared-env
   
-  reviewer-scoring-service:
-    build:
-      context: .
-      dockerfile: reviewer-scoring-service/Dockerfile
-    container_name: test-reviewer-scoring-service
-    depends_on:
-      - graph-service
-    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "./common/scripts/wait-for-it.sh", "graph-service:8000", "--", "python", "main.py"]
-    environment:
-      PYTHONPATH: /app
-      <<: *shared-env
-  
   reviewer-recommendation-service:
     build:
       context: .
       dockerfile: reviewer-recommendation-service/Dockerfile
     container_name: test-reviewer-recommendation-service
     depends_on:
-      - reviewer-scoring-service
+      - graph-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app

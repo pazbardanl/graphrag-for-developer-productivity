@@ -1,0 +1,18 @@
+FROM python:3.11
+
+WORKDIR /app
+
+# Copy requirements if you have them (adjust path if needed)
+COPY tests/unit/requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy the main source code and tests
+COPY graph_service /app/graph_service
+COPY common /app/common
+COPY tests/unit /app/tests/unit
+
+# Set PYTHONPATH so Python can find your package
+ENV PYTHONPATH=/app
+
+# Default command: run all unit tests
+CMD ["pytest", "tests/unit"]
