@@ -69,7 +69,7 @@ services:
   graph-service:
     build:
       context: .
-      dockerfile: graph-service/Dockerfile
+      dockerfile: graph_service/Dockerfile
     container_name: graph-service
     ports:
     - "8000:8000"
