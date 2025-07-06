@@ -1,4 +1,4 @@
-from services.graph_data_provider import GraphDataProvider
+from common.helpers.graph_data_provider import GraphDataProvider
 from services.publisher import Publisher
 from common.models.pr_event import PREventDto
 from common.models.reviewer_scores import ReviewerScoresDto

@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 
 # Copy the main source code and tests
 COPY graph_service /app/graph_service
+COPY reviewer_recommendation_service /app/reviewer_recommendation_service
 COPY common /app/common
 COPY tests/unit /app/tests/unit
 

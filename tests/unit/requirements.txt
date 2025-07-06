@@ -1,2 +1,4 @@
 networkx==3.3
+pydantic
+requests
 pytest
