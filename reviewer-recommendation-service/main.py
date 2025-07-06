@@ -12,10 +12,10 @@ logger = MyLogger().get_logger(__name__)
 
 def _get_kafka_config():
     kafka_bootstrap_servers = os.environ["KAFKA_BOOTSTRAP_SERVERS"]
-    new_pr_events_topic = os.environ["KAFKA_NEW_PR_EVENTS_TOPIC"]
+    reviewer_recommendation_requests_openai_topic = os.environ["KAFKA_REVIEWER_RECOMMENDATION_REQUESTS_OPENAI_TOPIC"]
     reviewer_recommendation_topic = os.environ["KAFKA_REVIEWER_RECOMMENDATION_TOPIC"]
     group_id = os.environ["KAFKA_REVIEWER_RECOMMENDATION_SERVICE_GROUP_ID"]
-    return kafka_bootstrap_servers, new_pr_events_topic, reviewer_recommendation_topic, group_id
+    return kafka_bootstrap_servers, reviewer_recommendation_requests_openai_topic, reviewer_recommendation_topic, group_id
 
 def _start_data_driver(kafka_bootstrap_servers, new_pr_events_topic, group_id, processor):
     data_driver = DataDriver(kafka_bootstrap_servers, new_pr_events_topic, group_id, processor)
@@ -23,12 +23,12 @@ def _start_data_driver(kafka_bootstrap_servers, new_pr_events_topic, group_id, p
 
 def main():
     logger.info("started")
-    kafka_bootstrap_servers, new_pr_events_topic, reviewer_recommendation_topic, group_id = _get_kafka_config()
+    kafka_bootstrap_servers, reviewer_recommendation_requests_openai_topic, reviewer_recommendation_topic, group_id = _get_kafka_config()
     graph_data_provider = GraphDataProvider("http://graph-service:8000")
     reviewer_selector: PRReviewerSelector = OpenAIPrReviewerSelector(graph_data_provider)
     publisher = Publisher(kafka_bootstrap_servers, reviewer_recommendation_topic)
     processor = Processor(reviewer_selector, publisher)
-    _start_data_driver(kafka_bootstrap_servers, new_pr_events_topic, group_id, processor)
+    _start_data_driver(kafka_bootstrap_servers, reviewer_recommendation_requests_openai_topic, group_id, processor)
     logger.info("exited")
 
 if __name__ == "__main__":

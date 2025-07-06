@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 from confluent_kafka import Producer, Consumer
 from common.helpers.my_logger import MyLogger
 from common.models.pr_event import PREventDto
+from common.models.pr_reviewer_recommendation_request import PrReviewerRecommendationRequest
 
 logger = MyLogger().get_logger(__name__)
 
@@ -31,6 +32,9 @@ def get_test_pr_events(json_file_path: str)-> List[PREventDto]:
     list_of_dicts = _read_json_file_as_list(json_file_path)
     raw_events = [_parse_pr_event(item) for item in list_of_dicts]
     return raw_events
+
+def get_events_as_list_of_dicts(json_file_path: str) -> List[dict]:
+    return _read_json_file_as_list(json_file_path)
 
 def _kafka_delivery_report(err, msg):
         if err is not None:
