@@ -1,7 +1,7 @@
 import openai
 import re
 from services.pr_reviewer_selector import PRReviewerSelector
-from services.graph_data_provider import GraphDataProvider
+from common.helpers.graph_data_provider import GraphDataProvider
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
 from common.models.selection_strategy import SelectionStrategy
 from common.models.pr_reviewer_recommendation_request import PrReviewerRecommendationRequest

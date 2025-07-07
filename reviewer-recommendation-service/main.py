@@ -5,7 +5,7 @@ from services.processor import Processor
 from common.helpers.my_logger import MyLogger
 from services.openai_pr_reviewer_selector import OpenAIPrReviewerSelector
 from services.pr_reviewer_selector import PRReviewerSelector
-from services.graph_data_provider import GraphDataProvider
+from common.helpers.graph_data_provider import GraphDataProvider
 from services.publisher import Publisher
 
 logger = MyLogger().get_logger(__name__)
