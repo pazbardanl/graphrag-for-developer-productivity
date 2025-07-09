@@ -95,7 +95,7 @@ services:
   reviewer-recommendation-service:
     build:
       context: .
-      dockerfile: reviewer-recommendation-service/Dockerfile
+      dockerfile: reviewer_recommendation_service/Dockerfile
     container_name: reviewer-recommendation-service
     depends_on:
       - reviewer-recommendation-requests-dispatching-service

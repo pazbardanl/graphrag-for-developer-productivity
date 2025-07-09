@@ -1,16 +1,16 @@
 import json
 from typing import Optional
+from pydantic import BaseModel
 from common.models.pr_reviewers_report import PRReviewerReport
 from common.models.selection_strategy import SelectionStrategy
 from common.models.reviewer_scores import ReviewerScoresDto
 
-class PRReviewerRecommendation:
-    def __init__(self, pr_number: int, recommended_reviewer: str, selection_strategy:SelectionStrategy, reasoning: str, reviewers_scoring_array: Optional[list[ReviewerScoresDto]] = None):
-        self.pr_number = pr_number
-        self.recommended_reviewer = recommended_reviewer
-        self.selection_strategy = selection_strategy
-        self.reasoning = reasoning
-        self.reviewers_scoring_array = reviewers_scoring_array
+class PRReviewerRecommendation(BaseModel):
+    pr_number: int
+    recommended_reviewer: str
+    selection_strategy: SelectionStrategy
+    reasoning: str
+    reviewers_scoring_array: Optional[list[ReviewerScoresDto]] = None
 
     def __str__(self):
         base = (

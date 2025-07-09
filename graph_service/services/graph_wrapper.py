@@ -1,4 +1,4 @@
-from  networkx import MultiDiGraph
+from networkx import MultiDiGraph
 from common.helpers.my_logger import MyLogger
 
 logger = MyLogger().get_logger(__name__)
