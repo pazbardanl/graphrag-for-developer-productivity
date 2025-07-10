@@ -8,10 +8,10 @@ from common.models.selection_strategy import SelectionStrategy
 logger = MyLogger().get_logger(__name__)
 
 class Processor:
-    # processor = Processor(user_data_provider, reviewer_recommendation_request_openai_publisher)
-    def __init__(self, user_data_provider: UserDataProvider, reviewer_recommendation_request_openai_publisher: Publisher):
+    def __init__(self, user_data_provider: UserDataProvider, reviewer_recommendation_request_openai_publisher: Publisher, reviewer_recommendation_request_heuristic_publisher: Publisher):
         self.user_data_provider = user_data_provider
         self.reviewer_recommendation_request_openai_publisher = reviewer_recommendation_request_openai_publisher
+        self.reviewer_recommendation_request_heuristic_publisher = reviewer_recommendation_request_heuristic_publisher
         logger.info("initialized")
 
     def process(self, json_string: str):
@@ -36,7 +36,7 @@ class Processor:
         if not selection_strategy or selection_strategy == SelectionStrategy.UNDETERMINED:
             logger.warning(f"Undetermined selection strategy for repo {repo_name}, defaulting to {SelectionStrategy.HEURISTIC}")
             selection_strategy = SelectionStrategy.HEURISTIC
-        logger.info(f"selection_strategy chosen: {selection_strategy}")
+        logger.info(f"pr_number {pr_number}: selection_strategy chosen: {selection_strategy}")
         pr_reviewer_recommendation_request = PrReviewerRecommendationRequest(
             pr_number=pr_number,
             repo_name=repo_name,
@@ -45,5 +45,9 @@ class Processor:
         match selection_strategy:
             case SelectionStrategy.OPENAI:
                 self.reviewer_recommendation_request_openai_publisher.publish(pr_reviewer_recommendation_request)
-            case SelectionStrategy.HEURISTIC | _:
+                logger.info(f"pr_number {pr_number}: published request to OPENAI reviewer recommendation request topic")
+            case SelectionStrategy.HEURISTIC:
+                self.reviewer_recommendation_request_heuristic_publisher.publish(pr_reviewer_recommendation_request)
+                logger.info(f"pr_number {pr_number}: published request to HEURISTIC reviewer recommendation request topic")
+            case _:
                 logger.error(f"unable to conclude selection strategy ({selection_strategy}), reviewer recommendation request not published")

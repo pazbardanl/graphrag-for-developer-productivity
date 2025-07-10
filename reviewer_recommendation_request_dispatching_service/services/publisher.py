@@ -19,7 +19,7 @@ class Publisher:
             payload = event.model_dump_json()
             self.producer.produce(topic=self.topic, value=payload, callback=self.delivery_report)
             self.producer.flush()
-            logger.debug(f"Produced message: {payload}")
+            logger.info(f"Produced message: topic = {self.topic}, payload = {payload}")
         except Exception as e:
             logger.error(f"Failed to produce message: {e}")
 

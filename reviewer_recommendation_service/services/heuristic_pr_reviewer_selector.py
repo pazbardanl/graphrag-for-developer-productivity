@@ -1,5 +1,5 @@
 from .pr_reviewer_selector import PRReviewerSelector
-from common.models.pr_event import PREventDto
+from common.models.pr_reviewer_recommendation_request import PrReviewerRecommendationRequest
 from common.models.reviewer_scores import ReviewerScoresDto
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
 from common.models.selection_strategy import SelectionStrategy
@@ -17,33 +17,40 @@ class HeuristicPRReviewerSelector(PRReviewerSelector):
         self.graph_data_provider = graph_data_provider
         logger.info("initialized")
 
-    def select(self, pr_event: PREventDto) -> PRReviewerRecommendation:
-        reviewer_scores_set = self._get_raw_reviewer_scores(pr_event)
-        print(f"[D] reviewer_scores_set = {reviewer_scores_set}")
+    def select(self, pr_reviewer_recommendation_request: PrReviewerRecommendationRequest) -> PRReviewerRecommendation:
+        if not pr_reviewer_recommendation_request:
+            logger.error(f"Empty (None) PR reviewer recommendation request, no recommendation (returning None).")
+            return None
+        if pr_reviewer_recommendation_request.selection_strategy != SelectionStrategy.HEURISTIC:
+            logger.error(f"PR reviewer recommendation request routing error: selection strategy expected to be HEURISTIC, but is actually: ({pr_reviewer_recommendation_request.selection_strategy}), no recommendation (returning None).")
+            return None
+        if not pr_reviewer_recommendation_request.pr_number:
+            logger.error(f"PR reviewer recommendation request does not contain a valid PR number ({pr_reviewer_recommendation_request.pr_number}), no recommendation (returning None).")
+            return None
+        reviewer_scores_set = self._get_raw_reviewer_scores(pr_reviewer_recommendation_request)
         selected_reviewer, selected_score = self._select_reviewer_by_max_weighted_score(reviewer_scores_set)
         reviewer_scores_set_sorted = sorted(reviewer_scores_set, key=lambda r: r.reviewer_user_id)
         return PRReviewerRecommendation(
-            pr_number=pr_event.pr_number,
+            pr_number=pr_reviewer_recommendation_request.pr_number,
             recommended_reviewer=selected_reviewer,
             selection_strategy=SelectionStrategy.HEURISTIC,
             reasoning=f"Selected reviewer {selected_reviewer} with max weighted score of {selected_score}, based on heuristic scoring.",
             reviewers_scoring_array=reviewer_scores_set_sorted
         )
 
-    def _get_raw_reviewer_scores(self, pr_event_dto: PREventDto) -> list[ReviewerScoresDto]:
-        pr_weights = self._calculate_pr_weights_for_pr_event(pr_event_dto)
-        print(f"[D] pr_weights = {pr_weights}")
-        author = pr_event_dto.pr_user
+    def _get_raw_reviewer_scores(self, pr_reviewer_recommendation_request: PrReviewerRecommendationRequest) -> list[ReviewerScoresDto]:
+        pr_weights = self._calculate_pr_weights_for_pr_reviewer_recommendation_request(pr_reviewer_recommendation_request)
+        author = self.graph_data_provider.get_pr_author(pr_reviewer_recommendation_request.pr_number)
         if not author:
-            logger.error('PR author not provided')
+            logger.error('PR author not found')
             return {}
         reviewer_scores_set = self._calculate_reviewer_scores(pr_weights, author)
         return reviewer_scores_set
         
-    def _calculate_pr_weights_for_pr_event(self, pr_event_dto: PREventDto) -> dict[int, float]:
-        original_pr_number = pr_event_dto.pr_number
-        repo_name = pr_event_dto.repo_name
-        changed_files = pr_event_dto.pr_files_changed
+    def _calculate_pr_weights_for_pr_reviewer_recommendation_request(self, pr_reviewer_recommendation_request: PrReviewerRecommendationRequest) -> dict[int, float]:
+        original_pr_number = pr_reviewer_recommendation_request.pr_number
+        repo_name = pr_reviewer_recommendation_request.repo_name
+        changed_files = self.graph_data_provider.get_files_modified_by_pr(original_pr_number)
         if not original_pr_number or not repo_name or not changed_files:
             logger.error('PR number, repo name or changed files not provided')
             return {}
@@ -99,11 +106,8 @@ class HeuristicPRReviewerSelector(PRReviewerSelector):
             return "NO_RECOMMENDED_USER", None
         for reviewer_score in reviewer_scores:
             user_to_weighted_score[reviewer_score.reviewer_user_id] = self._calculate_weighted_score(reviewer_score)
-        print(f"[D] user_to_weighted_score = {user_to_weighted_score}")
         max_score = max(user_to_weighted_score.values())
-        # Get all users with the max score
         max_users = [user for user, score in user_to_weighted_score.items() if score == max_score]
-        # Choose the first alphabetically
         max_score_user = sorted(max_users)[0]
         return max_score_user, max_score
 

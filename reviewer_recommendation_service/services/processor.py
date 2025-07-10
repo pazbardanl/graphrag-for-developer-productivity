@@ -27,7 +27,7 @@ class Processor:
             if not recommendation:
                 logger.info(f"No recommendation generated for PR {pr_reviewer_recommendation_request.pr_number}")
                 return
-            logger.debug(f"Recommendation: {recommendation}")
+            logger.info(f"PR number : {recommendation.pr_number}, Recommended reviewer: {recommendation.recommended_reviewer}") 
             self.publisher.publish(recommendation)
         except Exception as e:
             logger.error(f"Failed to get reviewer recommendation: {e}", exc_info=True)

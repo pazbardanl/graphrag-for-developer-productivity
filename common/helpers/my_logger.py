@@ -3,7 +3,7 @@ import sys
 
 class MyLogger:
 
-    DEFAULT_FORMAT = '%(asctime)s [%(name)s][%(levelname)s] %(message)s'
+    DEFAULT_FORMAT = '%(asctime)s [%(levelname)s][%(name)s] %(message)s'
 
     def __init__(self):
         self.configured = False

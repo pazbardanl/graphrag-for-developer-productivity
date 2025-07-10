@@ -11,11 +11,4 @@ class UserDataProvider:
         self.base_url = base_url
     
     def get_repo_reviewer_selection_strategy(self, repo_name:str) -> SelectionStrategy:
-        return SelectionStrategy.OPENAI
-        # url = f"{self.base_url}/subgraph/prs/{pr_number}/sibling-prs-by-common-files"
-        # response = requests.get(url, timeout=5)
-        # if response.status_code != 200:
-        #     logger.debug("Unable to fetch PR siblings subgraph pr_number %d", pr_number)
-        #     return[]
-        # logger.debug("Fetched PR siblings subgraph pr_number %d", pr_number)
-        # return response.json()
+        return SelectionStrategy.HEURISTIC

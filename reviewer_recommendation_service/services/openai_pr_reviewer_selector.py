@@ -42,7 +42,6 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
             logger.debug(f"Cannot build recommendation from AI reply: {ai_reply}")
             return None
         logger.debug(f'PRReviewerRecommendation = {recommendation}')
-        logger.info(f"PR number : {recommendation.pr_number}, Recommended reviewer: {recommendation.recommended_reviewer}") 
         return recommendation
     
     def _get_prompt(self, pr_subgraph_json: str, pr_number: int) -> str:
