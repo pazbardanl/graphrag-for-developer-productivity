@@ -3,10 +3,11 @@ x-shared-env: &shared-env
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
   KAFKA_PR_EVENTS_TOPIC: PR_events
   KAFKA_NEW_PR_EVENTS_TOPIC: new_PR_events
-  KAFKA_REVIEWER_REPORT_TOPIC: reviewer_reports
+  KAFKA_REVIEWER_RECOMMENDATION_REQUESTS_OPENAI_TOPIC: reviewer_recommendation_requests_openai
+  KAFKA_REVIEWER_RECOMMENDATION_REQUESTS_HEURISTIC_TOPIC: reviewer_recommendation_requests_heuristic
   KAFKA_REVIEWER_RECOMMENDATION_TOPIC: reviewer_recommendations
   KAFKA_GRAPH_SERVICE_GROUP_ID: graph_service_group
-  KAFKA_REVIEWER_SCORING_SERVICE_GROUP_ID: reviewer_scoring_service_group
+  KAFKA_REVIEWER_RECOMMENDATION_REQUEST_DISPATCHING_SERVICE_GROUP_ID: reviewer_recommendation_request_dispatching_service_group
   KAFKA_REVIEWER_RECOMMENDATION_SERVICE_GROUP_ID: reviewer_recommendation_service_group
   OPENAI_API_KEY: ${OPENAI_API_KEY}
 
@@ -46,7 +47,7 @@ services:
       "sleep 10 && \
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic PR_events --partitions 1 --replication-factor 1 && \
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic new_PR_events --partitions 1 --replication-factor 1 && \
-      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic reviewer_reports --partitions 1 --replication-factor 1 && \
+      kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic reviewer_recommendation_requests_openai --partitions 1 --replication-factor 1 && \
       kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic reviewer_recommendations --partitions 1 --replication-factor 1"
     ]
 
@@ -80,14 +81,40 @@ services:
       PYTHONPATH: /app
       <<: *shared-env
   
-  reviewer-recommendation-service:
+  reviewer-recommendation-requests-dispatching-service:
     build:
       context: .
-      dockerfile: reviewer-recommendation-service/Dockerfile
-    container_name: reviewer-recommendation-service
+      dockerfile: reviewer_recommendation_request_dispatching_service/Dockerfile
+    container_name: reviewer-recommendation-requests-dispatching-service
     depends_on:
       - graph-service
     entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
     environment:
       PYTHONPATH: /app
+      <<: *shared-env
+
+  reviewer-recommendation-openai-service:
+    build:
+      context: .
+      dockerfile: reviewer_recommendation_service/Dockerfile
+    container_name: reviewer-recommendation-openai-service
+    depends_on:
+      - reviewer-recommendation-requests-dispatching-service
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      PR_REVIEWER_SELECTOR: openai_pr_reviewer_selector
+      <<: *shared-env
+  
+  reviewer-recommendation-heuristic-service:
+    build:
+      context: .
+      dockerfile: reviewer_recommendation_service/Dockerfile
+    container_name: reviewer-recommendation-heuristic-service
+    depends_on:
+      - reviewer-recommendation-requests-dispatching-service
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      PR_REVIEWER_SELECTOR: heuristic_pr_reviewer_selector
       <<: *shared-env

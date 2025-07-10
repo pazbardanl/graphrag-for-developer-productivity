@@ -1,0 +1,17 @@
+[
+  {
+    "pr_number": 200,
+    "repo_name": "core_utils",
+    "selection_strategy": "openai"
+  },
+  {
+    "pr_number": 100,
+    "repo_name": "core/utils",
+    "selection_strategy": "openai"
+  },
+  {
+    "pr_number": 101,
+    "repo_name": "core/utils",
+    "selection_strategy": "openai"
+  }
+]

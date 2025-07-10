@@ -45,12 +45,30 @@ jobs:
           docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service test-runner
           docker compose down -v --remove-orphans
           docker system prune -af
-      
-      - name: Integration Test -- Graph Service -> Reviewer Recommendation Service
+        
+      - name: Component Test -- Reviewer Recommendation Requests Dispatching Service Test
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          TEST_FILE: tests/integration/test_graph_service_reviewer_recommendation_service_integ.py
+          TEST_FILE: tests/integration/test_component_reviewer_recommendation_request_dispatching_service.py
         run: |
-          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-recommendation-service test-runner
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka reviewer-recommendation-requests-dispatching-service test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af
+      
+      - name: Integration Test -- Graph Service -> Reviewer Recommendation Request Dispatching Service
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_integration__graph_service__reviewer_recommendation_request_dispatching_service.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-recommendation-requests-dispatching-service test-runner
+          docker compose down -v --remove-orphans
+          docker system prune -af
+
+      - name: Integration Test -- Graph Service -> Reviewer Recommendation Request Dispatching Service -> Reviewer Recommendation Service
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TEST_FILE: tests/integration/test_integration__graph_service__reviewer_recommendation_request_dispatching_service__reviewer_recommendation_service.py
+        run: |
+          docker compose -f docker-compose.test.yml up --build --abort-on-container-exit zookeeper kafka graph-service reviewer-recommendation-requests-dispatching-service reviewer-recommendation-service test-runner
           docker compose down -v --remove-orphans
           docker system prune -af

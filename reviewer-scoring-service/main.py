@@ -2,7 +2,7 @@ import os
 import threading
 from services.data_driver import DataDriver
 from services.processor import Processor
-from services.graph_data_provider import GraphDataProvider
+common.helpers.graph_data_provider import GraphDataProvider
 from services.publisher import Publisher
 from common.helpers.my_logger import MyLogger
 

@@ -2,10 +2,10 @@ x-shared-env: &shared-env
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
   KAFKA_PR_EVENTS_TOPIC: test_PR_events
   KAFKA_NEW_PR_EVENTS_TOPIC: test_new_PR_events
-  KAFKA_REVIEWER_REPORT_TOPIC: test_reviewer_reports
+  KAFKA_REVIEWER_RECOMMENDATION_REQUESTS_OPENAI_TOPIC: test_reviewer_recommendation_requests_openai
   KAFKA_REVIEWER_RECOMMENDATION_TOPIC: test_reviewer_recommendations
   KAFKA_GRAPH_SERVICE_GROUP_ID: test_graph_service_group
-  KAFKA_REVIEWER_SCORING_SERVICE_GROUP_ID: test_reviewer_scoring_service_group
+  KAFKA_REVIEWER_RECOMMENDATION_REQUEST_DISPATCHING_SERVICE_GROUP_ID: test_reviewer_recommendation_request_dispatching_service_group
   KAFKA_REVIEWER_RECOMMENDATION_SERVICE_GROUP_ID: test_reviewer_recommendation_service_group
   OPENAI_API_KEY: ${OPENAI_API_KEY}
 services:
@@ -53,10 +53,22 @@ services:
       PYTHONPATH: /app
       <<: *shared-env
   
+  reviewer-recommendation-requests-dispatching-service:
+    build:
+      context: .
+      dockerfile: reviewer_recommendation_request_dispatching_service/Dockerfile
+    container_name: test-reviewer-recommendation-requests-dispatching-service
+    depends_on:
+      - graph-service
+    entrypoint: ["./common/scripts/wait-for-it.sh", "kafka:9092", "--", "python", "main.py"]
+    environment:
+      PYTHONPATH: /app
+      <<: *shared-env
+
   reviewer-recommendation-service:
     build:
       context: .
-      dockerfile: reviewer-recommendation-service/Dockerfile
+      dockerfile: reviewer_recommendation_service/Dockerfile
     container_name: test-reviewer-recommendation-service
     depends_on:
       - graph-service
