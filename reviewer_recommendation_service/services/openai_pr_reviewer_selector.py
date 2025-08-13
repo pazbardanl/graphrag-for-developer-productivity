@@ -1,9 +1,10 @@
 import openai
 import re
 from services.pr_reviewer_selector import PRReviewerSelector
-from services.graph_data_provider import GraphDataProvider
+from common.helpers.graph_data_provider import GraphDataProvider
 from common.models.pr_reviewer_recommendation import PRReviewerRecommendation
-from common.models.pr_event import PREventDto
+from common.models.selection_strategy import SelectionStrategy
+from common.models.pr_reviewer_recommendation_request import PrReviewerRecommendationRequest
 from common.helpers.my_logger import MyLogger
 
 logger = MyLogger().get_logger(__name__)
@@ -17,24 +18,30 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
         self.graph_data_provider = graph_data_provider
         logger.info("initialized")
 
-    def select(self, pr_event: PREventDto) -> PRReviewerRecommendation:
-        if not pr_event:
-            logger.error(f"Empty (None) PR event, no recommendations (returning None).")
+    def select(self, pr_reviewer_recommendation_request: PrReviewerRecommendationRequest) -> PRReviewerRecommendation:
+        if not pr_reviewer_recommendation_request:
+            logger.error(f"Empty (None) PR reviewer recommendation request, no recommendation (returning None).")
             return None
-        pr_subgraph_json = self.graph_data_provider.get_pr_siblings_subgraph_by_common_modified_files(pr_event.pr_number)
+        if pr_reviewer_recommendation_request.selection_strategy != SelectionStrategy.OPENAI:
+            logger.error(f"PR reviewer recommendation request routing error: selection strategy expected to be OPENAI, but is actually: ({pr_reviewer_recommendation_request.selection_strategy}), no recommendation (returning None).")
+            return None
+        if not pr_reviewer_recommendation_request.pr_number:
+            logger.error(f"PR reviewer recommendation request does not contain a valid PR number ({pr_reviewer_recommendation_request.pr_number}), no recommendation (returning None).")
+            return None
+        pr_number = pr_reviewer_recommendation_request.pr_number
+        pr_subgraph_json = self.graph_data_provider.get_pr_siblings_subgraph_by_common_modified_files(pr_number)
         logger.debug(f"PR-siblings subgraph json:{pr_subgraph_json}")
         if not pr_subgraph_json:
-            logger.error(f"Empty PR-siblings subgraph for PR number {pr_event.pr_number}, no recommendations (returning None).")
+            logger.error(f"Empty PR-siblings subgraph for PR number {pr_number}, no recommendations (returning None).")
             return None
-        prompt = self._get_prompt(pr_subgraph_json, pr_event.pr_number)
+        prompt = self._get_prompt(pr_subgraph_json, pr_number)
         logger.debug(f"Generated prompt for OpenAI: {prompt}")
         ai_reply = self._get_open_ai_reply(prompt)
-        recommendation  = self._build_recommendation(ai_reply, pr_event)
+        recommendation  = self._build_recommendation(ai_reply, pr_reviewer_recommendation_request)
         if not recommendation:
             logger.debug(f"Cannot build recommendation from AI reply: {ai_reply}")
             return None
         logger.debug(f'PRReviewerRecommendation = {recommendation}')
-        logger.info(f"PR number : {recommendation.pr_number}, Recommended reviewer: {recommendation.recommended_reviewer}") 
         return recommendation
     
     def _get_prompt(self, pr_subgraph_json: str, pr_number: int) -> str:
@@ -80,7 +87,7 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
             logger.error("OpenAI response is empty")
             raise ValueError("OpenAI response is empty")
     
-    def _build_recommendation(self, ai_reply: str, pr_event: PREventDto) -> PRReviewerRecommendation:
+    def _build_recommendation(self, ai_reply: str, pr_reviewer_recommendation_request: PrReviewerRecommendationRequest) -> PRReviewerRecommendation:
         try:
             recommended_reviewer, reasoning = ai_reply.split('|', 1)
             recommended_reviewer = self._clean_reviewer(recommended_reviewer)
@@ -89,9 +96,10 @@ class OpenAIPrReviewerSelector(PRReviewerSelector):
             logger.warning(f"Invalid response format from OpenAI: {ai_reply}, no recommendation generated. Returning None.")
             return None
         recommendation = PRReviewerRecommendation(
-            pr_number=pr_event.pr_number,
+            pr_number=pr_reviewer_recommendation_request.pr_number,
             recommended_reviewer=recommended_reviewer,
-            reasoning=reasoning
+            reasoning=reasoning,
+            selection_strategy=pr_reviewer_recommendation_request.selection_strategy
         )
         return recommendation
     

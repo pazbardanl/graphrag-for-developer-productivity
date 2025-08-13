@@ -13,7 +13,7 @@
       ]
     },
     "repository": {
-      "full_name": "core_utils"
+      "full_name": "core/utils"
     },
     "sender": {
       "login": "alice"

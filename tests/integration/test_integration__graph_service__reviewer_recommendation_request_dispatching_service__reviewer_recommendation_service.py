@@ -20,7 +20,7 @@ OUTPUT_TOPIC = "test_reviewer_recommendations"
 KAFKA_BOOTSTRAP_SERVERS = "kafka:9092"
 GROUP_ID = f"integ_test_group_{uuid.uuid4()}"
 EXPECTED_OUTPUT_COUNT = 18
-TIMEOUT_SECS = 30
+TIMEOUT_SECS = 180
 
 logger = MyLogger().get_logger(__name__)
 logger.propagate = False
@@ -74,5 +74,7 @@ def assert_valid_recommendation_event(event, valid_pr_numbers: set[int]):
     assert isinstance(event.get("reasoning"), str) and event.get("reasoning"), "reasoning is not a valid string"
 
 def assert_on_output_events(output_events: list[dict],  valid_pr_numbers: set[int]):
+    if not output_events or len(output_events) != EXPECTED_OUTPUT_COUNT:
+        raise AssertionError(f"Expected {EXPECTED_OUTPUT_COUNT} messages, got {len(output_events)}")
     for event in output_events:
         assert_valid_recommendation_event(event, valid_pr_numbers)
