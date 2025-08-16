@@ -5,19 +5,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pazbarda.graphrag4devprod.userdata.entities.Repo;
+import com.pazbarda.graphrag4devprod.userdata.entities.RepoEntity;
 
-public interface RepoRepository extends CrudRepository<Repo, Integer>{
+public interface RepoRepository extends CrudRepository<RepoEntity, Integer>{
 
-    @Query("SELECT r FROM Repo r WHERE r.name = :name")
-    Repo findByName(String name);
+    RepoEntity findByName(String name);
 
-    @Query("SELECT r.reviewerSelectorStrategy FROM Repo r WHERE r.name = :name")
+    @Query("SELECT r.reviewerSelectorStrategy FROM RepoEntity r WHERE r.name = :name")
     String findReviewerSelectorStrategyByName(String name);
 
     @Transactional
     @Modifying
-    @Query("UPDATE Repo r SET r.reviewerSelectorStrategy = :strategy WHERE r.name = :repoName")
+    @Query("UPDATE RepoEntity r SET r.reviewerSelectorStrategy = :strategy WHERE r.name = :repoName")
     void setReviewerSelectorStrategy(String repoName, String strategy);
 }   
 

@@ -92,6 +92,19 @@ services:
       - ingestion-service
     environment:
       <<: *shared-env
+
+  pr-data-service:
+    build: 
+      context: .
+      dockerfile: PrDataService/Dockerfile
+    container_name: pr-data-service
+    ports:
+      - "8081:8080"
+    depends_on:
+      - ingestion-service
+    environment:
+      <<: *shared-env
+
   reviewer-recommendation-requests-dispatching-service:
     build:
       context: .

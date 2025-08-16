@@ -15,9 +15,8 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
 logging:
   level:
     root: INFO
   pattern:
-    console: "user-data-service | %d{yyyy-MM-dd HH:mm:ss.SSS} [%level][%C{1}] %msg%n"
+    console: "pr-data-service | %d{yyyy-MM-dd HH:mm:ss.SSS} [%level][%C{1}] %msg%n"
