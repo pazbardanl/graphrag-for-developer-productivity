@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pazbarda.graphrag4devprod.userdata.entities.Repo;
+import com.pazbarda.graphrag4devprod.userdata.entities.RepoEntity;
 import com.pazbarda.graphrag4devprod.userdata.models.SetRepoReviewerSelectorStrategyRequest;
 import com.pazbarda.graphrag4devprod.userdata.repositories.RepoRepository;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,7 +22,7 @@ public record RepoController(RepoRepository repoRepository) {
     @GetMapping("/reviewer-selector-strategy")
     public ResponseEntity<String> getReviewerSelectorStrategy(@RequestParam String name) {
         var strategy = repoRepository.findReviewerSelectorStrategyByName(name);
-        logger.info("Retrieved reviewer selector strategy for repo {}: {}", name, strategy);
+        logger.debug("Retrieved reviewer selector strategy for repo {}: {}", name, strategy);
         return strategy != null 
             ? ResponseEntity.ok(strategy) 
             : ResponseEntity.notFound().build();
@@ -33,7 +33,7 @@ public record RepoController(RepoRepository repoRepository) {
         var repo = repoRepository.findByName(request.repoName());
         if (null == repo) {
             logger.info("Creating new repo with name: {}", request.repoName());
-            repo = new Repo();
+            repo = new RepoEntity();
             repo.setName(request.repoName());
         }
         repo.setReviewerSelectorStrategy(request.strategy());
